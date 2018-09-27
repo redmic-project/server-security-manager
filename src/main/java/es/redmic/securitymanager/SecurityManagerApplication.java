@@ -1,14 +1,14 @@
-package es.redmic.template;
+package es.redmic.securitymanager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan({ "es.redmic.template" })
-public class TemplateApplication {
+@ComponentScan({ "es.redmic.securitymanager" })
+public class SecurityManagerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TemplateApplication.class, args);
+		SpringApplication.run(SecurityManagerApplication.class, args);
 	}
 }
