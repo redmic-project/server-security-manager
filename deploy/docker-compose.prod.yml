@@ -1,7 +1,7 @@
 version: '3.5'
 
 services:
-  template:
+  security-manager:
     deploy:
       mode: replicated
       replicas: 1
