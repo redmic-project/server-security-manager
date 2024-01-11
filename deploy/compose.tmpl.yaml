@@ -4,6 +4,7 @@ services:
     environment:
       JAVA_OPTS:
     networks:
+      redmic-net:
       kafka-net:
       traefik-net:
       metric-net:
@@ -34,6 +35,11 @@ services:
           memory: ${RESOURCES_RESERVATIONS_MEMORY:-410M}
 
 networks:
+  redmic-net:
+    name: ${REDMIC_NET_NAME:-redmic-net}
+    driver: ${REDMIC_NET_DRIVER:-overlay}
+    external: true
+
   kafka-net:
     name: ${KAFKA_NET_NAME:-kafka-net}
     driver: ${KAFKA_NET_DRIVER:-overlay}
