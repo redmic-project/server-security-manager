@@ -2,39 +2,36 @@ include:
   - project: 'redmic-project/gitlab-ci-templates'
     ref: master
     file: '/maven-building-microservice.yml'
+include:
   - project: 'redmic-project/gitlab-ci-templates'
     ref: master
-    file: '/license-listing.yml'
+    file: '/building/maven/microservice.yml'
   - project: 'redmic-project/gitlab-ci-templates'
     ref: master
-    file: '/packaging.yml'
+    file: '/scanning/dependency-scanning.yml'
   - project: 'redmic-project/gitlab-ci-templates'
     ref: master
-    file: '/deployment.yml'
+    file: '/packaging-docker/docker-build.yml'
+  - project: 'redmic-project/gitlab-ci-templates'
+    ref: master
+    file: '/deployment-service/docker-deploy.yml'
+  - project: 'redmic-project/gitlab-ci-templates'
+    ref: master
+    file: '/deployment-service/custom-image.yml'
 
 stages:
   - build
-  - license-list
+  - test
+  - pre-package
   - package
-  - test-package
+  - post-package
   - deploy
 
-variables:
-  DOCKER_BUILD_ARGS: --build-arg PARENT_IMAGE_NAME=${REDMIC_SERVER_IMAGE_NAME} --build-arg PARENT_IMAGE_TAG=${REDMIC_SERVER_IMAGE_TAG}
-  STACK: security-manager
+.docker-build:
+  variables:
+    DBLD_PARENT_IMAGE_NAME: ${REDMIC_SERVER_IMAGE_NAME}
+    DBLD_PARENT_IMAGE_TAG: ${REDMIC_SERVER_IMAGE_TAG}
 
 .deploy:
-  script:
-    - >
-      deploy.sh IMAGE_NAME=${IMAGE_NAME} IMAGE_TAG=${IMAGE_TAG} COMPOSE_FILE=${COMPOSE_FILE}
-      SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-  environment:
-    url: https://${PUBLIC_HOSTNAME}/api/${CI_PROJECT_NAME}
-
-.deploy-development:
   variables:
-    SPRING_PROFILES_ACTIVE: pre
-
-.deploy-production:
-  variables:
-    SPRING_PROFILES_ACTIVE: prod
+    STACK: security-manager

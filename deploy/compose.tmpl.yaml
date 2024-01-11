@@ -1,0 +1,50 @@
+services:
+  security-manager:
+    image: ${IMAGE_NAME:-registry.gitlab.com/redmic-project/server/security-manager}:${IMAGE_TAG:-latest}
+    environment:
+      JAVA_OPTS:
+    networks:
+      kafka-net:
+      traefik-net:
+      metric-net:
+    healthcheck:
+      test: wget --spider -q http://localhost:${MICROSERVICE_PORT}/api/security/actuator/health
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
+      retries: ${HEALTHCHECK_RETRIES:-5}
+      start_period: ${HEALTHCHECK_START_PERIOD:-2m}
+    deploy:
+      mode: replicated
+      replicas: ${REPLICAS:-1}
+      restart_policy:
+        delay: ${RESTART_DELAY:-1m}
+      update_config:
+        delay: ${UPDATE_DELAY:-2m}
+      labels:
+        traefik.enable: ${TRAEFIK_ENABLE:-true}
+        traefik.http.routers.security-manager.entrypoints: ${TRAEFIK_ENTRYPOINT:-http}
+        traefik.http.routers.security-manager.rule: (Host(`${PUBLIC_HOSTNAME}`) || Host(`${TRAEFIK_SUBDOMAIN}.${PUBLIC_HOSTNAME}`)) && PathPrefix(`/api/security`)
+        traefik.http.services.security-manager.loadbalancer.server.port: ${MICROSERVICE_PORT}
+      resources:
+        limits:
+          cpus: '${RESOURCES_LIMITS_CPUS:-0.5}'
+          memory: ${RESOURCES_LIMITS_MEMORY:-512M}
+        reservations:
+          cpus: '${RESOURCES_RESERVATIONS_CPUS:-0.001}'
+          memory: ${RESOURCES_RESERVATIONS_MEMORY:-410M}
+
+networks:
+  kafka-net:
+    name: ${KAFKA_NET_NAME:-kafka-net}
+    driver: ${KAFKA_NET_DRIVER:-overlay}
+    external: true
+
+  traefik-net:
+    name: ${TRAEFIK_NET_NAME:-traefik-net}
+    driver: ${TRAEFIK_NET_DRIVER:-overlay}
+    external: true
+
+  metric-net:
+    name: ${METRIC_NET_NAME:-metric-net}
+    driver: ${METRIC_NET_DRIVER:-overlay}
+    external: true
